@@ -1,0 +1,525 @@
+<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+<script type="text/javascript" src="/static/zTree3/js/jquery.ztree.core.js"></script>
+
+<!-- Main Quill library -->
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet"> 
+<script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
+<script src="/static/dist/quill-emoji.js"></script>
+
+<!-- Theme included stylesheets -->
+<link href="//cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+
+<div class="layui-row" style="margin: 5px;">
+    <div style="margin: 10px 10px" class="toolTop">
+        <blockquote class="layui-elem-quote">
+            Paciente: Nome: <strong>{{.paciente.Nome}}</strong>
+             | Telefone: <strong>{{.paciente.Telefone}}</strong>
+             | Sexo: <strong>{{.paciente.Sexo}}</strong>
+             | Peso: <strong>{{.paciente.Peso}}</strong>
+             | Altura: <strong>{{.paciente.Altura}}</strong>
+             | 
+             <a class="layui-btn layui-btn-normal layui-btn-xs"
+                title="Alt Paciente"
+                lay-event="editP"><i class="fa fa-pencil">Alterar dados do paciente</i></a>
+        </blockquote>
+    </div>
+    
+    <table width="100%">
+        <tr>
+            <td style="width: 80%;">
+                    <div class="layui-layout layui-layout-admin" style="padding-left: 10px;margin-top: 10px;">
+                        <form action="" onsubmit="javascript:;" name="form" method="post">
+                            <div style="border-bottom: 1px dashed rgb(114, 113, 113); height: 25px;">
+                                <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="add">Nova Nota</button>
+                                <button class="layui-btn layui-btn-normal layui-btn-sm" lay-submit="" lay-filter="edit">Gravar</button>
+                                <a class="layui-btn layui-btn-danger layui-btn-sm" href="javascript:;" id="del" lay-submit="">Excluir</a>
+                                <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="import" >Importar</button>
+                                <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="print" >Imprimir</button>
+                            </div>
+                            <br>
+                            <div class="layui-input-inline" style="width: 35%;">
+                                <label class="label-micro">IDENTIFICAÇÃO</label>
+                                <input type="text" name="nome" id="nome"  autocomplete="off" placeholder="digite um identificador" class="layui-input form-control field-text" value="{{.atendimento.Nome}}">
+                            </div>
+            
+            
+                            <div class="layui-input-inline" style="width: 25%;">
+                                <label class="label-micro"> COR DO FUNDO:</label>
+                                <div class="layui-input-inline">
+                                    <select name="cor_id" id="cor_id" lay-verify="required" onchange="corSelectChange()" >
+                                        <option value="-1">Selecione uma cor</option>
+                                        {{range $index,$elem := .corlists}}
+                                        <option name="n1n2n3" value="{{$elem.Id}}">({{$elem.Cor}}) {{$elem.Nome}}</option>
+                                        {{end}}
+                                    </select>
+                                </div>
+                            </div>  
+            
+                            <!-- Barra de ferramentas -->
+                            <div quill-editor-toolbar id="toolbar" style="width=80%; background-color: #f5f8d9;">
+                        
+                                <span title="Fonte" class="ql-formats">
+                                    <select class="ql-font">
+                                      <option selected></option>
+                                      <option value="serif"></option>
+                                      <option value="monospace"></option>
+                                    </select>
+                                </span>
+                        
+                                <span title="Alinhamento" class="ql-formats">
+                                    <select class="ql-align">
+                                      <option value="" selected></option>
+                                      <option value="center"></option>
+                                      <option value="justify"></option>
+                                      <option value="right"></option>
+                                    </select>
+                                    
+                                    <span title="Limpar" class="ql-format-group">
+                                        <button class="ql-clean" value="clean">Limpar</button>
+                                    </span>
+                                </span>
+            
+                                <span class="ql-format-group">
+                                    <button title="Negrito" class="ql-bold"></button>
+                                    <button title="Itálico" class="ql-italic"></button>
+                                    <button title="Sublinhado" class="ql-underline"></button>
+                                </span>
+                                <span class="ql-format-group">
+                                    <button title="Subescrito" class="ql-script" value="sub"></button>
+                                    <button title="Superescrito" class="ql-script" value="super"></button>
+                                </span>
+                        
+                                <span class="ql-format-group">
+                                    <select class="ql-color"></select>
+                                    <select class="ql-background"></select>
+                                </span>
+                                 
+                                <span class="ql-format-group">
+                                    <button title="Lista numerada" class="ql-list" value="ordered"></button>
+                                    <button title="Lista simples" class="ql-list" value="bullet"></button>
+                                </span>
+                                
+                                <span class="ql-format-group">
+                                    <select title="Tam Texto" class="ql-size">
+                                        <option value="small">Pequeno</option>
+                                        <!-- Note a missing, thus falsy value, is used to reset to default -->
+                                        <option selected>Normal</option>
+                                        <option value="large">Grande</option>
+                                        <option value="huge">Super</option>
+                                    </select>    
+                                </span>
+            
+                            </div>
+                            <!-- Conteudo -->
+                            <div name="div_conteudo">
+                                <div id="editor" style="width: 100%; height: 450px"></div>
+                            </div>
+            
+                            <input type="hidden" name="paciente_id" autocomplete="off" id="paciente_id" class="layui-input" value="{{.paciente.Id}}">
+                            <input type="hidden" name="id" autocomplete="off" class="layui-input" id="id" value="0">
+                            <input type="hidden" name="aId" autocomplete="off" id="aId" class="layui-input" readonly value="{{.atendimento.aId}}">                             
+                            <input type="hidden" name="nId" autocomplete="off" id="nId" class="layui-input" readonly value="{{.atendimento.nId}}">
+                            <input type="hidden" name="cor" autocomplete="off" id="cor" class="layui-input" readonly value="{{.atendimento.Cor}}">
+                            <input type="hidden" name="id_atual" autocomplete="off" class="layui-input" id="id_atual" value="{{.paciente.NoSelecionado}}">
+                            <input type="hidden" name="conteudo" autocomplete="off" id="conteudo" class="layui-input" value="{{.atendimento.Conteudo}}">
+            
+                        </form>
+                    </div>
+                            
+            </td>
+            <td width="20%">
+                <ul id="treeDemo" class="ztree" style="vertical-align: top; margin-left: 10px; height:600px; width: auto; margin-right: 10px;">
+                    <!--<div class="zTreeDemoBackground left" style="width: 100%;margin-left: 20px;margin-right: 0px">
+                        <ul  style="height:600px; width: 20%; margin-bottom: 10px;">
+                        </ul>
+                    </div>-->
+                </ul>
+            </td>
+
+        </tr>
+    </table>
+
+    
+</div>
+
+<script>
+    var quill = new Quill('#editor', {
+        modules: {
+            toolbar: "#toolbar"
+        },
+        theme: 'snow'
+    });
+    quill.root.innerHTML = document.getElementById("conteudo").value;
+</script>
+
+<script>
+    var $,form;
+    
+    layui.config({
+                base : "js/"
+        }).use(['form','element','layer','jquery'],function(){
+          form = layui.form; //Somente após esta etapa ser realizada, alguns elementos do formulário serão decorados automaticamente com sucesso
+          $ = layui.jquery;
+          form.on("submit",function(data) {
+                var sub_type = data.elem.getAttribute("lay-filter")
+                //console.log(sub_type)
+                switch(sub_type) {
+                    case 'add':
+                            $("#id").val(0);
+                            //$("#aId").val(0);
+                            $("#nId").val(0);
+                            $("#nome").val('');
+                            $("#conteudo").val('');
+                            quill.root.innerHTML = '';
+                        return false;
+                        break;
+                    case 'import':
+                        var pacienteId = $("#paciente_id").val();
+                        var modId = layer.open({
+                            title: 'Selecione um Modelo',
+                            closeBtn: false,
+                            type: 1,
+                            btn: ["Usar","Fechar"],
+                            content: '<div style="width: 250px; padding-left: 20px"> ' +
+                                       '<label for="nome_modelo"> Modelo: </label>' +
+                                       '<select name="nome_modelo" id="nome_modelo" lay-verify="required" >' +
+                                         '<option value="-1">Selecione um modelo</option>' +
+                                           '{{range $index,$elem := .modelolists}}' +
+                                              '<option name="n1n2n3" value="{{$elem.Id}}"> {{$elem.Nome}}</option>' +
+                                           '{{end}}' +
+                                        '</select>' +
+                                     '</div>',
+                            yes: function(index, layero){
+                                var modeloId = layero.find('select')[0].value;
+                                var modeloNome = layero.find('select')[0].options[layero.find('select')[0].selectedIndex].text;
+                                //console.log(modeloId);
+                                if (modeloId > 0){
+                                    var adjustPage = layer.open({
+                                        type: 2,
+                                        shade: [0.4, '#a0d06c'],
+                                        shadeClose: false,         //yes: fecha ao clicar fora da janela
+                                        id: 1,
+                                        skin: 'layui-layer-molv',
+                                        anim: 1,
+                                        title: "Importação de modelo",
+                                        content: '/import/receita?pacienteId='+pacienteId+'&modeloId='+modeloId,
+                                        btn: ['<i class="layui-icon layui-icon-yes"/> Importar', '<i class="layui-icon layui-icon-close"/> Fechar'],
+                                        yes: function(adjustPage, layero){
+                                            var json_data = $(layero).find("iframe")[0].contentWindow;
+            
+                                            $("form[name=form]").find("input[name=nome]").val(modeloNome);
+                                            $("form[name=form]").find("input[name=conteudo]").val(json_data.quill.container.innerHTML);                            
+                                            quill.root.innerHTML = json_data.quill.root.innerHTML;
+                                            //quill.root.innerHTML = "TESTE";
+                                            //console.log(json_data.quill.container.innerHTML);
+                                            layer.close(adjustPage);
+            
+                                        },
+                                        area: ['70%','80%'],   
+                                    });
+                                }
+                                layer.close(index);
+                            }
+
+                          });     
+
+                        return false;
+                        break;
+                    case 'print':
+                        var pacienteId = $("#paciente_id").val();
+                        var aId = $("#aId").val();
+                        var nId = $("#nId").val();
+                        var rel = "";
+                        if (nId != "0") {
+                            rel = "nota";
+                        } else {
+                            rel = "atendimento";
+                        }
+                        var adjustPage = layer.open({
+                            type: 2,
+                            shade: [0.4, '#a0d06c'],
+                            shadeClose: false,         //yes: fecha ao clicar fora da janela
+                            id: 1,
+                            skin: 'layui-layer-molv',
+                            anim: 1,
+                            title: "Preparação da Impressão: ("+rel+")",
+                            content: '/print/'+rel+'?pacienteId='+pacienteId+'&aId='+$("#aId").val()+'&nId='+$("#nId").val(),
+                            //btn: ['<i class="layui-icon layui-icon-print"/> Imprimir', '<i class="layui-icon layui-icon-close"/> Fechar'],
+                            //yes: function(adhustPage, layero){
+                            //    var json_data = $(layero).find("iframe")[0].contentWindow;
+                            //
+                            //    preview2(quill.container.innerHTML);
+                                //console.log(json_data.quill.container.innerHTML);
+                                //layer.close(adjustPage);
+                                //return true;
+
+                            //},
+                            area: ['70%','80%'],   
+                        });
+                        return false;
+                        break;
+                    case 'corSelectChange':
+                        $("form[name=form]").find("div[name=div_conteudo]").css('background-color', '#ff0030');
+                        
+                        return false;
+                        break;
+
+                    case 'edit':
+                        var cont = quill.root.innerHTML;
+                        $("#conteudo").val(cont);
+                        
+                        $("form[name=form]").find("input[name=id_atual]").val($("#id").val());
+                        var form_data = $("form").serialize();
+                        $.post('{{urlfor "AtendimentoController.AjaxSave"}}', form_data, function (out) {   
+                            if (out.status == 0) {
+                                layer.msg("Gravado com sucesso!",{icon: 1},function () {
+                                    window.location.reload();
+                                });
+                            } else {
+                                layer.msg(out.message)
+                            }
+                        }, "json");
+                        return false;
+
+                }
+            });
+
+
+            $( "select" ).change(function () {
+                var str = "";
+                $( "select option:selected" ).each(function() {
+                    str += $( this ).text() + " ";
+                });
+                
+                var cor = str.toString().substring(1,8);  //extrai a cor do text
+                //console.info(cor);
+
+                $("form[name=form]").find("div[name=div_conteudo]").css('background-color', cor);
+            }).change();
+
+            form.render();
+            //No entanto, se seu HTML for gerado dinamicamente, a renderização automática falhará
+            //Portanto, você precisa executar os seguintes métodos para renderizar manualmente nos locais correspondentes, semelhante a este element.init();
+        }); 
+    </script>
+
+
+<script type="text/javascript">
+    var zNodes = [{ id:1, pId:0, name:"erro de dados"}]; 
+    $(document).ready(function(){ 
+        var setting = {
+            view: {
+                dblClickExpand: false,
+                showLine: true,
+                selectedMulti: false
+            },
+            //edit: {
+            //  enable: true
+            //},
+            data: {
+                simpleData: {
+                    enable: true,
+                    idKey: "id",
+                    pIdKey: "pId",
+                }
+            },
+            callback: {
+                beforeDrag: beforeDrag,
+                onClick: editOnClick
+            }
+        };
+
+        function editOnClick(e, treeId, treeNode) {
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+            nodes = zTree.getSelectedNodes();
+
+            if(nodes[0].parentTId){
+                var parentInfo = zTree.getNodeByTId(nodes[0].parentTId);
+                pid     = parentInfo.id;
+                pname   = parentInfo.name;
+            }
+            
+            var id = nodes[0].id;
+            var aId = nodes[0].aId;
+            var nId = nodes[0].nId;
+
+            if(id==1){
+                $("form[name=form]").find("input[name=id]").val("0");
+                $("form[name=form]").find("input[name=aId]").val("0");
+                $("form[name=form]").find("input[name=nId]").val('0');
+                $("form[name=form]").find("input[name=nome]").val("");
+                $("form[name=form]").find("input[name=cor]").val("#F0F0E0");
+                quill.root.innerHTML = '';
+
+                form.render();
+            } else {
+                $("#id").val(id);
+            }
+
+            var pId = $("#paciente_id").val();
+            $.ajax({
+                type: "POST",
+                url: "/atendimento/getnode",
+                data: {
+                    id:   id,
+                    aId: aId,
+                    nId: nId,
+                    pacienteId: pId 
+                },
+                dataType: 'json',
+                success: function(data) {
+                    
+                    if(data.code==0){
+                        $("form[name=form]").find("input[name=aId]").val(data.data.aId);
+                        $("form[name=form]").find("input[name=nId]").val(data.data.nId);
+                        $("form[name=form]").find("input[name=nome]").val(data.data.Nome);
+                        $("form[name=form]").find("input[name=cor]").val(data.data.Cor);
+                        $("form[name=form]").find("input[name=conteudo]").val(data.data.nota.Conteudo);
+                        quill.root.innerHTML = data.data.nota.Conteudo;
+
+                        $("form[name=form]").find("div[name=div_conteudo]").css('background-color', data.data.Cor);
+                        $("form[name=form]").find("select[name=cor_id]").val(data.data.CorId);
+            
+                        form.render();
+                    }
+                }
+            }); 
+        }
+
+        function beforeDrag(treeId, treeNodes) {
+            return false;
+        }
+        
+        function setEdit() {
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        }
+        // //adicionar nó
+        var newCount = 1;
+        var maxId = 0;
+        function add(e) {
+            var maxId = $('#max_id').val();
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+            isParent = e.data.isParent,
+            nodes = zTree.getSelectedNodes(),
+            treeNode = nodes[0];
+
+            if (treeNode) {
+                treeNode = zTree.addNodes(treeNode, {id:(maxId -(-newCount)), pId:treeNode.id, isParent:isParent, name:"new node" + treeNode.id + (newCount++)});
+            } else {
+                treeNode = zTree.addNodes(null, {id:(maxId -(-newCount)), pId:0, isParent:isParent, name:"novo nó" + (newCount++)});
+            }
+
+            if (treeNode) {
+                zTree.editName(treeNode[0]);
+            } else {
+                alert("O nó folha está bloqueado e não pode adicionar nós filhos");
+            }
+        };
+        function showCode(str) {
+            var code = $("#code");
+            code.empty();
+            for (var i=0, l=str.length; i<l; i++) {
+                code.append("<li>"+str[i]+"</li>");
+            }
+        }    
+        //carregar árvore
+        
+        refresh_tree();
+
+        function refresh_tree()
+        { 
+            var id = $("#id").val();
+            var aId = $("#aId").val();
+            var nId = $("#nId").val();
+            var pId = $("#paciente_id").val();
+            var time   = Date.parse(new Date());
+            $.ajax({
+                type: "POST",
+                url: "/atendimento/getnodes?paciente_id="+pId,
+                data: {time:time},
+                dataType: 'json',
+                success: function(data) {
+                    if(data.code==0){
+                        zNodes = data.data;
+                        var treeObj = $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+
+                        treeObj.expandAll(true);
+
+                        var id_atual = $("#id_atual").val();
+                        
+                        if (id_atual == 0) {
+                            id_atual = 1
+                        }
+
+                        node = treeObj.getNodeByParam('id', id_atual); 
+
+                        //Select the first child node
+                        treeObj.selectNode(node);
+
+                        editOnClick(null, null, node);
+
+                        $("form[name=form]").find("input[name=nome]").val(node.name);                 
+                    }
+                }
+            }); 
+
+        }
+
+        $(".toolTop").click(function () {
+            var pacienteId = $("#paciente_id").val();
+            layer.open({
+                type: 2,
+                shade: [0.4, '#a0d06c'],
+                shadeClose: true,
+                id: 1,
+                skin: 'layui-layer-lan',
+                anim: 1,
+                title: "Alterando Paciente",
+                content: '/atendimento/editpaciente?paciente_id='+pacienteId,
+                //btn: ['<i class="layui-icon layui-icon-ok" lay-submit="" lay-filter="sub"> Gravar</i>', '<i class="layui-icon layui-icon-close"/> Fechar'],
+                area: ['800px','480px'],
+                page: {
+                    html: '<\div style="width:460px; height:280px; background-color:#81BA25; color:#fff;"><\div style="padding:20px;">里面传入任何html元素<\/div><\/div>' 
+                }
+            });
+        });
+
+        //Excluir
+        $('#del').on('click',function(){
+            var id = $("#id").val();
+            var aId = $("#aId").val();
+            var nId = $("#nId").val();
+            if (id==0) {
+                layer.msg('Selecione um nó na árvore de permissões à esquerda');
+                return false;
+            }
+            layer.confirm('Tem certeza de que deseja excluir? ' + $("#aId").val(), {icon: 3, title:'Confirme'}, function(index){
+                $.post('{{urlfor "AtendimentoController.AjaxDel"}}', {id:id, a_Id:aId, n_Id:nId}, function (out) {
+                    if (out.status == 0) {
+
+                        layer.msg("Excluído com sucesso!",{icon: 1},function () {
+                            window.location.reload();
+                        });
+                    } else {
+                        layer.msg(out.message)
+                    }
+                }, "json");
+            });
+            return false;
+        });
+
+        function beforeClick(treeId, treeNode) {
+            var check = (treeNode && !treeNode.isParent);
+            if (!check) alert("não pode escolher");
+            return check;
+        }
+        
+        function onBodyDown(event) {
+            if (!(event.target.id == "menuBtn" || event.target.id == "menuContent" || $(event.target).parents("#menuContent").length>0)) {
+                hideMenu();
+            }
+        }
+
+    });
+    
+</script>

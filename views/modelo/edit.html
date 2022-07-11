@@ -1,0 +1,133 @@
+<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+<script type="text/javascript" src="/static/zTree3/js/jquery.ztree.core.js"></script>
+
+<!-- Main Quill library -->
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet"> 
+<script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
+<script src="/static/dist/quill-emoji.js"></script>
+
+<!-- Theme included stylesheets -->
+<link href="//cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+
+<div class="layui-row">        
+    <div class="layui-col-md9">
+        <div class="layui-layout layui-layout-admin" style="padding-left: 20px;margin-top: 20px;">
+            <form action="" name="form" onsubmit="javascript:;" method="post">
+                <div class="layui-input-inline" style="width: 20%;">
+                    <label class="label-micro">NOME</label>
+                    <input type="text" name="nome" id="nome"  autocomplete="off" placeholder="digite um identificador" class="layui-input form-control field-text" value="{{.Detalhe.nome}}">
+                </div>
+
+                <!-- Barra de ferramentas -->
+                <div quill-editor-toolbar id="toolbar" style="width: 90%; background-color: #f5f8d9;">
+            
+                    <span title="Fonte" class="ql-formats">
+                        <select class="ql-font">
+                          <option selected></option>
+                          <option value="serif"></option>
+                          <option value="monospace"></option>
+                        </select>
+                    </span>
+            
+                    <span title="Alinhamento" class="ql-formats">
+                        <select class="ql-align">
+                          <option value="" selected></option>
+                          <option value="center"></option>
+                          <option value="justify"></option>
+                          <option value="right"></option>
+                        </select>
+                        
+                        <span title="Limpar" class="ql-format-group">
+                            <button class="ql-clean" value="clean">Limpar</button>
+                        </span>
+                    </span>
+
+                    <span class="ql-format-group">
+                        <button title="Negrito" class="ql-bold"></button>
+                        <button title="Itálico" class="ql-italic"></button>
+                        <button title="Sublinhado" class="ql-underline"></button>
+                    </span>
+                    <span class="ql-format-group">
+                        <button title="Subescrito" class="ql-script" value="sub"></button>
+                        <button title="Superescrito" class="ql-script" value="super"></button>
+                    </span>
+            
+                    <span class="ql-format-group">
+                        <select class="ql-color"></select>
+                        <select class="ql-background"></select>
+                    </span>
+                     
+                    <span class="ql-format-group">
+                        <button title="Lista numerada" class="ql-list" value="ordered"></button>
+                        <button title="Lista simples" class="ql-list" value="bullet"></button>
+                        <button class="ql-image"></button>
+                    </span>
+                    
+                    <span class="ql-format-group">
+                        <select title="Tam Texto" class="ql-size">
+                            <option value="small">Pequeno</option>
+                            <!-- Note a missing, thus falsy value, is used to reset to default -->
+                            <option selected>Normal</option>
+                            <option value="large">Grande</option>
+                            <option value="huge">Super</option>
+                        </select>    
+                    </span>
+
+                </div>
+                <!-- Conteudo -->
+                <div name="div_conteudo">
+                    <div id="editor" style="width: 90%; height: auto; background-color: rgb(230, 231, 233);"></div>
+                </div>
+
+                <hr>
+
+                <input type="hidden" id="id" name="id" value="{{.Detalhe.id}}">
+                <input type="hidden" name="detalhe" autocomplete="off" id="detalhe" class="layui-input" value="{{.Detalhe.detalhe}}">
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="gravar">Gravar</button>
+                        <button type="reset" class="layui-btn layui-btn-warm">Desfazer</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    var quill = new Quill('#editor', {
+        modules: {
+            toolbar: "#toolbar"
+        },
+        theme: 'snow'
+    });
+    quill.root.innerHTML = document.getElementById("detalhe").value;
+</script>
+
+<script>
+// console.log(sourceList);
+layui.use(['form','element','table','layer','jquery'],function(){
+    var form = layui.form; 
+    var $ = layui.jquery;
+    var table = layui.table;
+
+    form.on('submit(gravar)', function(data){
+        var cont = quill.root.innerHTML;
+        $("#detalhe").val(cont);
+        var form_data = $("form").serialize();
+        $.post('{{urlfor "ModeloController.AjaxSave"}}', form_data, function (out) {
+            if (out.status == 0) {
+                layer.msg("Operação bem-sucedida",{icon: 1},function () {
+                    window.location.href="/modelo/list";
+                })
+            } else {
+                layer.msg(out.message)
+            }
+        }, "json");
+        return false;
+    });
+
+  form.render();
+}); 
+</script>

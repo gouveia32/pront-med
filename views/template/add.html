@@ -1,0 +1,130 @@
+<link rel="stylesheet" href="/static/editor.md/css/editormd.min.css" />
+<div class="layui-layout layui-layout-admin" style="padding-left: 40px;margin-top: 20px;">
+    <form class="layui-form" action="" method="post">
+        <div class="layui-form-item">
+            <label class="layui-form-label">nome do modelo</label>
+            <div class="layui-input-block " style="width: 400px">
+                <input type="text" name="template_name" id="template_name" lay-verify="required" autocomplete="off" placeholder="Por exemplo: modelo de interface" class="layui-input" value="">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">conteúdo do documento</label>
+            <div class="layui-input-inline" id="api-editormd" style="border: 1px solid #e4e4e4">
+<textarea name="detail" style="display:none;">
+    
+    #### Uma breve descrição:
+
+    - Interface de login do usuário
+    
+    
+    #### Cabeçalhos da solicitação:
+    
+    |Nome do parâmetro|Requerido|Tipo|Descrição|
+    |:---- |:---|:----- |----- |
+    |Content-Type |yes |string |Tipo de solicitação: application/json |
+    |Content-MD5 |Sim |string |Solicitar assinatura de conteúdo |
+    
+    
+    #### Parâmetros de solicitação:
+    
+    |Nome do parâmetro|Obrigatório|Tipo|Descrição|Exemplo de valor
+    |:---- |:---|:----- |----- |----- |
+    |nome de usuário |sim |string |nome de usuário |admin
+    |senha |sim |sequência |senha | 123456
+    
+    #### Parâmetros de retorno:
+    
+    |nome do parâmetro|tipo|descrição|
+    |:----- |:-----|----- |
+    |group_level |int |ID do grupo de usuários, 1: superadministrador; 2: usuário comum |
+    
+    #### Exemplo de retorno:
+    
+    **Retorne quando estiver correto:**
+
+```
+{
+"status": 200,
+"message": "Success",
+"data": {
+    "uid": "1",
+    "account": "admin",
+    "nickname": "Minho",
+    "group_level": 0 ,
+    "create_time": "1436864169",
+    "last_login_time": "0",
+}
+}
+```
+
+**Retorno em caso de erro:**
+
+
+```
+{
+"status": 300,
+"message": "invalid username"
+"data":{
+    
+}
+}
+````
+
+#### Exemplo de invocação:
+
+````
+
+<?php
+    echo "Olá mundo";
+````
+#### Observação:
+
+- Para obter mais códigos de erro de retorno, consulte a descrição do código de erro na página inicial
+
+#### Versão da interface:
+
+|Número da versão|Desenvolvedor|Data do desenvolvimento|Data da revisão|
+|:---- |:---|:----- |----- |
+|2.1.0 |Hao Daquan |2018-01-15 | 2018-01-15 |
+</textarea>
+            </div>
+        </div>
+
+        
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="" lay-filter="sub">Enviar</button>
+                <button type="reset" class="layui-btn layui-btn-warm">Desfazer</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+// console.log(sourceList);
+layui.use(['form','element','table','layer','jquery'],function(){
+    var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+    var $ = layui.jquery;
+    var table = layui.table;
+
+    form.on('submit(sub)', function(data){
+        var form_data = data.field;
+        $.post('{{urlfor "TemplateController.AjaxSave"}}', form_data, function (out) {
+            if (out.status == 0) {
+                layer.msg("Operação bem-sucedida",{icon: 1},function () {
+                    window.location.href="/template/list";
+                })
+            } else {
+                layer.msg(out.message)
+            }
+        }, "json");
+        return false;
+    });
+    // No entanto, se seu HTML for gerado dinamicamente, a renderização automática falhará
+    //Então você precisa executar o seguinte método para renderizar manualmente no local correspondente, semelhante a este element.init();
+  form.render();
+}); 
+</script>
+
+{{template "public/editormd.html" .}}

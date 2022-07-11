@@ -1,0 +1,68 @@
+<link rel="stylesheet" href="/static/editor.md/css/editormd.min.css" />
+<div class="layui-layout layui-layout-admin" style="padding-left: 20px;margin-top: 20px;">
+<!--     <div style="margin: 10px 0px">
+            <blockquote class="layui-elem-quote">
+                Descrição: Alterando os dados da etiqueta
+            </blockquote>
+        </div> -->
+    <form class="layui-form" action="" method="post" >
+        <table width="75%">
+            <tr>
+                <td style="width: 30%">
+                    <label class="label-micro">NOME</label>
+                    <input type="text" name="nome" id="nome"  autocomplete="off" placeholder="nome" class="layui-input form-control field-text" value="{{.campo.nome}}">
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 30%">
+                    <label class="label-micro">DESCRIÇÃO</label>
+                    <input type="text" name="descricao" id="descricao"  autocomplete="off" placeholder="descricao" class="layui-input form-control field-text" value="{{.campo.descricao}}">
+                </td>
+                <td style="width: 3%"></td>
+                <td style="width: 40%">
+                    <label class="label-micro">RESPOSTA</label>
+                    <input type="text" name="resposta" id="resposta"  autocomplete="off" placeholder="resposta" class="layui-input form-control field-text" value="{{.campo.resposta}}">
+                </td>
+            </tr>
+        </table>
+        <br>
+        <br>
+
+        <input type="hidden" id="id" name="id" value="{{.campo.id}}">
+            
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="" lay-filter="sub">Gravar</button>
+                <button type="reset" class="layui-btn layui-btn-warm">Desfazer</button>
+            </div>
+        </div>
+    </form>
+    </div>
+    <script>
+    var $;
+        layui.config({
+                base : "js/"
+        }).use(['form','element','layer','jquery'],function(){
+            var form = layui.form; //Somente após esta etapa ser realizada, alguns elementos do formulário serão deetiquetaados automaticamente com sucesso
+            var $ = layui.jquery;
+        
+            form.on('submit(sub)', function(data){
+                var form_data = $("form").serialize();
+                $.post('{{urlfor "CampoController.AjaxSave"}}', form_data, function (out) {
+                    if (out.status == 0) {
+                        layer.msg("Operação bem-sucedida",{icon: 1},function () {
+                            window.location.href='{{urlfor "CampoController.List"}}'
+                        })
+                    } else {
+                        layer.msg(out.message)
+                    }
+                }, "json");
+                return false;
+            });
+          
+          //No entanto, se seu HTML for gerado dinamicamente, a renderização automática falhará
+          // element.init();
+
+          form.render();
+    }); 
+    </script>

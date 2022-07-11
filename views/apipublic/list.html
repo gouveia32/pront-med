@@ -1,0 +1,107 @@
+<div class="layui-layout layui-layout-admin" style="padding-left: 20px;">
+    <div class="layui-row" style="margin-top: 20px;">
+        <div class="layui-col-xs6">
+            <div class="layui-btn-group">
+              <button class="layui-btn" id="add_api">Aumentar</button>
+            </div>
+            <!-- <a class="layui-btn" data-type="tabAdd" href="/api/add">Novo</a>  -->
+            <!-- <a href="javascript:;" id="add_api" class="layui-btn"> Novo接口 </a>  
+            <a href="javascript:;" id="add_audit" class="layui-btn layui-btn-primary"> Enviar revisão </a> -->
+        </div>
+        <div class="layui-col-xs6 search_text">
+            <form class="layui-form" action="" onsubmit="javascript:return false;">
+                <div class="demoTable">
+                    <div class="layui-inline" style="width: 40%">
+                        <input class="layui-input" name="ApiPublicName" id="ApiPublicName" autocomplete="off" placeholder="nome do arquivo" >
+                    </div>
+                    
+                    <button class="layui-btn" data-type="reload" id="reload">Investigar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <table class="layui-hide" id="table_list" lay-filter="table_filter">
+    </table>
+
+    <script type="text/html" id="bar">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">Editar</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">Excluir</a>
+
+    </script>
+</div>
+<script>
+
+    layui.use(['table','form','element'], function(){
+        var table = layui.table;
+        var form = layui.form;
+        var element = layui.element;
+
+        //renderização em nível de método
+        table.render({
+            elem: '#table_list'
+            ,url: '/apipublic/table'
+            ,cols: [[
+                // {checkbox: true, fixed: true},
+                {field:'id', title: 'ID', align:'center',sort: true, width:50}
+                ,{field:'api_public_name',title: 'Nome'}
+                ,{field:'sort',title: 'Ordenar'}
+                ,{field:'create_time', title: 'hora de criação'}
+                ,{field:'update_time', title: 'hora de alteração'}
+                ,{fixed: 'right', width:160, align:'center', toolbar: '#bar'}
+            ]]
+            ,id: 'listReload'
+            ,page: true
+            ,height: "full-130"
+        });
+
+        var $ = layui.$, active = {
+            reload: function(){
+                table.reload('listReload', {
+                    where: {
+                        ApiPublicName: $('#ApiPublicName').val()
+                    }
+                });
+            }
+        };
+
+        $("#add_api").on("click",function() {
+            window.location.href="/apipublic/add"
+        })
+
+
+        //Barra de ferramentas do monitor
+        table.on('tool(table_filter)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'edit'){
+                window.location.href="/apipublic/edit?id="+data.id
+            } else if(obj.event === 'del'){
+                var msg = "Deseja excluir "+data.api_public_name+"? ";
+                
+                layer.confirm(msg, function(){
+                    var del_data = {"id":data.id}
+                    $.post('{{urlfor "ApiPublicController.AjaxDel"}}', del_data, function (out) {
+                        if (out.status == 0) {
+                            layer.msg("Operação bem-sucedida",{icon: 1},function () {
+                                $("#reload").click();
+                            })
+                        } else {
+                            layer.msg(out.message)
+                        }
+                    }, "json");        
+                    return false;
+                });
+                return false;
+                
+            }else{
+                layer.msg('Ação não existe');
+            }
+        });
+
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+
+</script>

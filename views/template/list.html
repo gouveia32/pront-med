@@ -1,0 +1,103 @@
+<div class="layui-layout layui-layout-admin" style="padding-left: 20px;">
+    <div class="layui-row" style="margin-top: 20px;">
+        <div class="layui-col-xs6">
+            <div class="layui-btn-group">
+              <button class="layui-btn" id="add_api">Novo</button>
+            </div>
+        </div>
+        <div class="layui-col-xs6 search_text">
+            <form class="layui-form" action="" onsubmit="javascript:return false;">
+                <div class="demoTable">
+                    <div class="layui-inline" style="width: 40%">
+                        <input class="layui-input" name="TemplateName" id="TemplateName" autocomplete="off" placeholder="nome do arquivo" >
+                    </div>
+                    
+                    <button class="layui-btn" data-type="reload" id="reload">Investigar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <table class="layui-hide" id="table_list" lay-filter="table_filter">
+    </table>
+
+    <script type="text/html" id="bar">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">Editar</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">Excluir</a>
+
+    </script>
+</div>
+<script>
+
+    layui.use(['table','form','element'], function(){
+        var table = layui.table;
+        var form = layui.form;
+        var element = layui.element;
+
+        //方法级渲染
+        table.render({
+            elem: '#table_list'
+            ,url: '/template/table'
+            ,cols: [[
+                // {checkbox: true, fixed: true},
+                {field:'id', title: 'ID', align:'center',sort: true, width:50}
+                ,{field:'template_name',title: 'Nome do modelo'}
+                ,{field:'create_time', title: 'tempo de criação'}
+                ,{field:'update_time', title: 'tempo de alteração'}
+                ,{fixed: 'right', width:160, align:'center', toolbar: '#bar'}
+            ]]
+            ,id: 'listReload'
+            ,page: true
+            ,height: "full-130"
+        });
+
+        var $ = layui.$, active = {
+            reload: function(){
+                table.reload('listReload', {
+                    where: {
+                        TemplateName: $('#TemplateName').val()
+                    }
+                });
+            }
+        };
+
+        $("#add_api").on("click",function() {
+            window.location.href="/template/add"
+        })
+
+
+        //监听工具条
+        table.on('tool(table_filter)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'edit'){
+                window.location.href="/template/edit?id="+data.id
+            } else if(obj.event === 'del'){
+                var msg = "Confirma exclusão"+data.template_name+"?";
+                
+                layer.confirm(msg, function(){
+                    var del_data = {"id":data.id}
+                    $.post('{{urlfor "TemplateController.AjaxDel"}}', del_data, function (out) {
+                        if (out.status == 0) {
+                            layer.msg("Operação bem-sucedida",{icon: 1},function () {
+                                $("#reload").click();
+                            })
+                        } else {
+                            layer.msg(out.message)
+                        }
+                    }, "json");        
+                    return false;
+                });
+                return false;
+                
+            }else{
+                layer.msg('Ação não existe');
+            }
+        });
+
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+
+</script>

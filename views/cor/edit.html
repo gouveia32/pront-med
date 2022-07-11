@@ -1,0 +1,67 @@
+<style>
+    .nav-title{
+        display: none;
+    }
+</style>
+<link rel="stylesheet" href="/static/editor.md/css/editormd.min.css" />
+<div class="layui-layout layui-layout-admin" style="padding-left: 20px;margin-top: 20px;">
+<!--     <div style="margin: 10px 0px">
+            <blockquote class="layui-elem-quote">
+                Descrição: Alterando os dados da cor
+            </blockquote>
+        </div> -->
+    <form class="layui-form" action="" method="post" >
+        <table width="95%">
+            <tr>
+                <td style="width: 35%">
+                    <label class="label-micro">NOME</label>
+                    <input type="text" name="nome" id="nome"  autocomplete="off" placeholder="nome" class="layui-input form-control field-text" value="{{.cor.nome}}">
+                </td>
+                <td style="width: 10%"></td>
+                <td style="width: 20%">
+                    <input id="cor" name="cor" type="color" value="{{.cor.cor}}">
+                </td>
+            </tr>
+        </table>
+        <br>
+        <hr>
+
+        <input type="hidden" id="id" name="id" value="{{.cor.id}}">
+            
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="" lay-filter="sub">Gravar</button>
+                <button type="reset" class="layui-btn layui-btn-warm">Desfazer</button>
+            </div>
+        </div>
+    </form>
+    </div>
+    <script>
+    var $;
+        layui.config({
+                base : "js/"
+        }).use(['form','element','layer','jquery'],function(){
+            var form = layui.form; //Somente após esta etapa ser realizada, alguns elementos do formulário serão decorados automaticamente com sucesso
+            var $ = layui.jquery;
+        
+            form.on('submit(sub)', function(data){
+                var form_data = $("form").serialize();
+                $.post('{{urlfor "CorController.AjaxSave"}}', form_data, function (out) {
+                    if (out.status == 0) {
+                        layer.msg("Operação bem-sucedida",{icon: 1},function () {
+                            window.parent.layer.closeAll();
+                            window.parent.location.reload();
+                        })
+                    } else {
+                        layer.msg(out.message)
+                    }
+                }, "json");
+                return false;
+            });
+          
+          //No entanto, se seu HTML for gerado dinamicamente, a renderização automática falhará
+          // element.init();
+
+          form.render();
+    }); 
+    </script>

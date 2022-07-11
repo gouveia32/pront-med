@@ -1,0 +1,48 @@
+<div class="layui-layout layui-layout-admin" style="padding-left: 40px;margin-top: 20px;">
+    <form class="layui-form" action="" method="post" >
+        <table width="95%">
+            <tr>
+                <td style="width: 35%">
+                    <label class="label-micro">NOME DA ETIQUETA</label>
+                    <input type="text" name="nome" id="nome"  autocomplete="off" placeholder="nome da etiqueta" class="layui-input form-control field-text" value="{{.etiqueta.nome}}">
+                </td>
+            </tr>
+        </table>
+        <br>
+        <br>
+            
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="" lay-filter="sub">Enviar</button>
+                <button type="reset" class="layui-btn layui-btn-warm">Desfazer</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    var $;
+        layui.config({
+                base : "js/"
+        }).use(['form','element','layer','jquery'],function(){
+            var form = layui.form; //Somente após esta etapa ser realizada, alguns elementos do formulário serão deetiquetaados automaticamente com sucesso
+            var $ = layui.jquery;
+        
+            form.on('submit(sub)', function(data){
+                var form_data = $("form").serialize();
+                $.post('{{urlfor "EtiquetaController.AjaxSave"}}', form_data, function (out) {
+                    if (out.status == 0) {
+                        layer.msg("Operação bem-sucedida",{icon: 1},function () {
+                            window.location.href='{{urlfor "EtiquetaController.List"}}'
+                        })
+                    } else {
+                        layer.msg(out.message)
+                    }
+                }, "json");
+                return false;
+            });
+          
+          //No entanto, se seu HTML for gerado dinamicamente, a renderização automática falhará
+          // element.init();
+          form.render();
+    }); 
+</script>

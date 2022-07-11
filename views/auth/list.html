@@ -1,0 +1,376 @@
+<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+<script type="text/javascript" src="/static/zTree3/js/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="/static/zTree3/js/jquery.ztree.excheck.js"></script>
+<script type="text/javascript" src="/static/zTree3/js/jquery.ztree.exedit.js"></script>
+
+<div class="layui-row">
+    <div style="margin: 10px 20px">
+        <blockquote class="layui-elem-quote">
+            Nota: Para adicionar permissão, preencha os dados relevantes e salve-os diretamente; para modificar e excluir, clique na árvore de permissão à esquerda para selecionar o nó de permissão a ser modificado
+        </blockquote>
+    </div>
+        
+    <div class="layui-col-md5 zTreeDemoBackground" style="margin-left: 20px;margin-right: 0px">
+        <ul id="treeDemo" class="ztree" style="height:320px; width: auto; margin-bottom: 10px;">
+        </ul>
+    </div>
+    <div class="layui-col-md7">
+        <div class="layui-layout layui-layout-admin" style="padding-left: 40px;margin-top: 20px;">
+            <form class="layui-form" action="" onsubmit="javascript:;" name="form" method="post">
+                
+                <div class="layui-form-item">
+                    <label class="layui-form-label">nome da permissão</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="auth_name" lay-verify="required" autocomplete="off" placeholder="Insira um nome de permissão" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux"></div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">pai</label>
+                    <div class="layui-input-inline" style="width: 210px;">
+                       <input type="text" name="pname" lay-verify="required" autocomplete="off" placeholder="todas permissões" disabled value="todas permissões" class="layui-input" id="pname">
+                      
+                    </div>
+                    <div class="layui-input-inline" style="width: 50px;">
+                        <input type="text" name="pid" autocomplete="off" placeholder="0" id="pid" class="layui-input" readonly value="1">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">
+
+                        <button id="menuBtn" type="button" class="layui-btn layui-btn-xs layui-btn-normal" >Selecione a categoria principal</button>
+                    </div>
+                </div>
+                
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">Endereço</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="auth_url" lay-verify="required" autocomplete="off" placeholder="/home" class="layui-input" value="/">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux"></div>
+                </div>
+                
+                <div class="layui-form-item">
+                    <label class="layui-form-label">Ícone</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="icon" autocomplete="off" placeholder="fa-bar-chart-o" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux"><a href="http://fontawesome.dashgame.com" target="_blank">Clique aqui para referência</a></div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">Ordenar</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="sort" lay-verify="required" autocomplete="off" placeholder="999" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux"></div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">Motrar</label>
+                    <div class="layui-input-inline">
+                        <input type="radio" name="is_show" value="0" title="Não" checked>
+                        <input type="radio" name="is_show" value="1" title="Sim">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">Se a barra de navegação esquerda é exibida</div>
+                </div>
+
+                <input type="hidden" name="id" class="layui-input" id="id" value="0">
+                
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="add">Novo</button>
+                        <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="edit">Alterar</button>
+                        <a class="layui-btn layui-btn-danger" href="javascript:;" id="del" lay-submit="">Excluir</a>
+                        <button type="reset" class="layui-btn layui-btn-primary">Redefinir</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="menuContent" class="menuContent" style="display:none; position: absolute;">
+    <ul id="treeMenu" class="ztree" style="margin-top:0; width:200px; height: 200px"></ul>
+</div>
+
+
+
+<script>
+var $,form;
+    layui.config({
+            base : "js/"
+    }).use(['form','element','layer','jquery'],function(){
+      form = layui.form; //Somente após esta etapa ser realizada, alguns elementos do formulário serão decorados automaticamente com sucesso
+      $ = layui.jquery;
+      form.on("submit",function(data) {
+            var sub_type = data.elem.getAttribute("lay-filter")
+            console.log(sub_type)
+            if(sub_type=="add"){
+                $("#id").val(0);
+            }else{
+                if($("#id").val()=="0"){
+                    layer.msg("Para modificar, selecione um nó na árvore de permissões à esquerda")
+                    return false
+                }
+            }
+            console.log($("form").serialize());
+
+            $.post('{{urlfor "AuthController.AjaxSave"}}', $("form").serialize(), function (out) {
+                
+                if (out.status == 0) {
+                    // layer.msg("Operação bem-sucedida")
+                    layer.alert('Gravado com sucesso!', {icon: 1},function(index){
+                        window.location.reload();
+                    });
+                } else {
+                    layer.msg(out.message)
+                }
+            }, "json");
+            return false;
+        });
+
+        form.render();
+        //No entanto, se seu HTML for gerado dinamicamente, a renderização automática falhará
+        //Portanto, você precisa executar os seguintes métodos para renderizar manualmente nos locais correspondentes, semelhante a este element.init();
+        
+    }); 
+</script>
+
+<script type="text/javascript">
+    var zNodes = [{ id:1, pId:0, name:"erro de dados"}]; 
+    $(document).ready(function(){ 
+        // $("form[name=form]").parent().find("input[type=radio]").eq(1).attr("checked", true);
+        var setting = {
+            // edit: {
+            //  enable: true
+            // },
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            },
+            callback: {
+                beforeDrag: beforeDrag,
+                onClick: editOnClick
+            }
+        };
+
+        function editOnClick(e, treeId, treeNode) {
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+            nodes = zTree.getSelectedNodes();
+            if(nodes[0].id==1){
+                alert('Modificar o nó raiz não é permitido');
+                return;
+            }
+
+            if(nodes[0].parentTId){
+                var parentInfo = zTree.getNodeByTId(nodes[0].parentTId);
+                pid     = parentInfo.id;
+                pname   = parentInfo.name;
+            }
+            
+            var id = nodes[0].id;
+
+            $("#pid").val(nodes[0].pId);
+            $("#id").val(nodes[0].id);
+            $("#pname").val(pname);
+            $("form[name=form]").find("input[name=auth_name]").val(nodes[0].name);
+
+            $.ajax({
+                type: "POST",
+                url: "/auth/getnode",
+                data: {id:id},
+                dataType: 'json',
+                success: function(data) {
+                    
+                    if(data.code==0){
+                        $("form[name=form]").find("input[name=auth_url]").val(data.data.auth_url);
+                        $("form[name=form]").find("input[name=icon]").val(data.data.icon);
+                        $("form[name=form]").find("input[name=sort]").val(data.data.sort);
+                        var is_show = data.data.is_show
+                        $("form[name=form]").find("input[type=radio][value="+is_show+"]").attr("checked", true);
+                        $("form[name=form]").find("input[type=radio][value="+is_show+"]").click();
+                        form.render();
+                    }
+                }
+            }); 
+        
+        }
+
+        function beforeDrag(treeId, treeNodes) {
+            return false;
+        }
+        
+        function setEdit() {
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        }
+        // //adicionar nó
+        var newCount = 1;
+        var maxId = 0;
+        function add(e) {
+            var maxId = $('#max_id').val();
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+            isParent = e.data.isParent,
+            nodes = zTree.getSelectedNodes(),
+            treeNode = nodes[0];
+
+            if (treeNode) {
+                treeNode = zTree.addNodes(treeNode, {id:(maxId -(-newCount)), pId:treeNode.id, isParent:isParent, name:"new node" + treeNode.id + (newCount++)});
+            } else {
+                treeNode = zTree.addNodes(null, {id:(maxId -(-newCount)), pId:0, isParent:isParent, name:"new node" + (newCount++)});
+            }
+
+            if (treeNode) {
+                zTree.editName(treeNode[0]);
+            } else {
+                alert("O nó folha está bloqueado e não pode adicionar nós filhos");
+            }
+        };
+        function showCode(str) {
+            var code = $("#code");
+            code.empty();
+            for (var i=0, l=str.length; i<l; i++) {
+                code.append("<li>"+str[i]+"</li>");
+            }
+        }    
+        //加载树
+        refresh_tree();
+
+
+        function refresh_tree()
+        { 
+            var time   = Date.parse(new Date());
+            $.ajax({
+                type: "POST",
+                url: "/auth/getnodes",
+                data: {time:time},
+                dataType: 'json',
+                success: function(data) {
+                    if(data.code==0){
+                        zNodes = data.data;
+                        $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+                        $.fn.zTree.init($("#treeMenu"), menu, zNodes);
+                    }
+                }
+            }); 
+            setEdit();
+            $("#remove").bind("change", setEdit);
+            $("#rename").bind("change", setEdit);
+            $("#removeTitle").bind("propertychange", setEdit)
+            .bind("input", setEdit);
+            $("#renameTitle").bind("propertychange", setEdit)
+            .bind("input", setEdit);
+        }
+
+        // //Novo type=1
+        // $('#submit_add_button').on('click',function(){
+        //     var data = $('form[name=form_add]').serialize();
+
+        //     ajaxRequest({'nodes':data,'type':1},'/auth/auth/save_auth','submit_add_button','POST',0);
+        // });
+
+        // //Novo type=2
+        // $('#submit_edit_button').on('click',function(){
+        //     var data = $('form[name=form_add]').serialize();
+
+        //     ajaxRequest({'nodes':data,'type':2},'/auth/auth/save_auth','submit_edit_button','POST',0);
+        // });
+
+        //Excluir
+        $('#del').on('click',function(){
+            var id = $("#id").val();
+            if (id==0) {
+                layer.msg('Selecione um nó na árvore de permissões à esquerda');
+                return false;
+            }
+            layer.confirm('Tem certeza de que deseja excluir?', {icon: 3, title:'dica'}, function(index){
+                $.post('{{urlfor "AuthController.AjaxDel"}}', {id:id}, function (out) {
+                    if (out.status == 0) {
+                        // layer.msg("操作成功")
+                        layer.alert('Você excluiu com sucesso', {icon: 1},function(index){
+                            window.location.reload();
+                        });
+                    } else {
+                        layer.msg(out.message)
+                    }
+                }, "json");
+            });
+            return false;
+        });
+
+        // //清空
+        // $('#submit_cancel_button').on('click',function(){
+        //     var fields = ['id','pid','pname','name','menu_url','sort'];
+        //     $.each(fields,function(k,v) {
+        //         $("form[name=form_add]").find("input[name="+v+"]").val('');
+        //     });
+            
+        // });
+
+        //以下是下拉选择框
+        var menu = {
+            view: {
+                dblClickExpand: false
+            },
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            },
+            callback: {
+                // beforeClick: beforeClick,
+                onClick: onClick
+            }
+        };
+
+
+        function beforeClick(treeId, treeNode) {
+            var check = (treeNode && !treeNode.isParent);
+            if (!check) alert("não pode escolher");
+            return check;
+        }
+        
+        function onClick(e, treeId, treeNode) {
+            var zTree = $.fn.zTree.getZTreeObj("treeMenu"),
+            nodes = zTree.getSelectedNodes(),
+            v = "";
+            
+            nodes.sort(function compare(a,b){return a.id-b.id;});
+            for (var i=0, l=nodes.length; i<l; i++) {
+                v += nodes[i].name + ",";
+            }
+            if (v.length > 0 ) v = v.substring(0, v.length-1);
+            var pid = $("#pid");
+
+            $("#pid").val(nodes[0].id);
+            $("#pname").val(v);
+
+            hideMenu()
+        }
+
+        $("#menuBtn").on("click",function(){
+            showMenu()
+        })
+
+        function showMenu() {
+            var pname = $("#pname");
+            var paOffset = $("#pname").offset();
+//            var sideOffset = $("#left_side").width();
+//            console.log(sideOffset.left)
+            $("#menuContent").css({left:(paOffset.left) + "px", top:(paOffset.top - pname.outerHeight()+70) + "px"}).slideDown("fast");
+
+            $("body").bind("mousedown", onBodyDown);
+        }
+        function hideMenu() {
+            $("#menuContent").fadeOut("fast");
+            $("body").unbind("mousedown", onBodyDown);
+        }
+        function onBodyDown(event) {
+            if (!(event.target.id == "menuBtn" || event.target.id == "menuContent" || $(event.target).parents("#menuContent").length>0)) {
+                hideMenu();
+            }
+        }
+
+    });
+</script>

@@ -1,0 +1,125 @@
+<div class="layui-layout layui-layout-admin" style="padding-left: 20px;">
+    <div class="layui-row" style="margin-top: 20px;">
+        <div class="layui-col-xs6 toolTop">
+            <a class="layui-btn" lay-event="addP">Nova Cor</a>
+       </div>
+
+        <div class="layui-col-xs6 search_text">
+            <form class="layui-form" action="" onsubmit="return false;" >
+                <div class="demoTable">
+                    <div class="layui-inline" style="width: 40%">
+                        <input class="layui-input" name="buscaCor" id="buscaCor" autocomplete="off" placeholder="pesquisar: código ou nome" >
+                    </div>
+                    <button class="layui-btn" data-type="reload" data-placement="top" title="Filtrar"><i class="layui-icon">&#xe615;</i></button>
+                    <button class="layui-btn layui-btn-normal layui-btn-xm" data-type="reload" type="reset" data-placement="top" title="Limpar filtro">X</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <table class="layui-hide" id="table_list" lay-filter="table_filter"></table>
+    <table id="order" class="layui-hide" lay-filter="order"></table>
+
+</div>
+<script type="text/html" id="bar">
+     <a class="layui-btn layui-btn-xs"
+        title="alterar"
+        lay-event="edit"><i class="fa fa-pencil"></i></a>
+        
+     <a class="layui-btn layui-btn-danger layui-btn-xs" 
+        title="excluir" 
+        lay-event="del"><i class="fa fa-trash"></i></a>
+ </script>
+
+
+<script>
+    layui.use(['table','form','element'], function(){
+        var table = layui.table;
+        var form = layui.form;
+        var element = layui.element;
+
+        //renderização em nível de método
+        table.render({
+            elem: '#table_list'
+            ,url: '/cor/table'
+            
+            ,cols: [[
+               // {checkbox: true, fixed: true},
+                {field:'id', title: 'Id', align:'center',sort: true, width:70}
+                ,{field:'nome',title: 'Nome',sort: true}
+                ,{field:'cor', title: 'Cor', width:100}
+                ,{fixed:'right', title: 'Ação', width:100, align:'center', toolbar: '#bar'}
+            ]]
+            ,id: 'listReload'
+            ,page: true
+            ,height: "full-130"
+        });
+
+        var $ = layui.$, active = {
+            reload: function(){
+                table.reload('listReload', {
+                    where: {
+                        Nome: $('#buscaCor').val(),
+                        //ContatoNome: $('#buscaEmpregado').val(),
+                    }
+                });
+            }
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        $('.toolTop .layui-btn').on('click', function(){
+            layer.open({
+                type: 2,
+                shade: [0.4, '#d3d8d9'],
+                shadeClose: true,
+                id: 1,
+                skin: 'layui-layer-molv',
+                anim: 1,
+                title: "Novo Paciente",
+                content: '/cor/add',
+                area: ['500px','250px'],
+            });
+        });
+
+    //Barra de ferramentas do monitor
+    table.on('tool(table_filter)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'detail'){
+            //layer.msg('ID：'+ data.id + ' operação de visualização de');
+        } else if(obj.event === 'del'){
+            layer.confirm('realmente deseja excluir ['+data.nome+']?', {icon: 3,title: 'CONFIRMAÇÃO'}, function(index){
+            var jsData = {'id':data.id}
+            $.post('{{urlfor "CorController.AjaxDel"}}', jsData, function (out) {
+                if (out.status == 0) {
+                    layer.alert('Excluído com sucesso', {icon: 1},function(index){
+                        layer.close(index);
+                        window.location.reload();
+                    });
+                } else {
+                    layer.msg(out.message)
+                }
+            }, "json");
+            obj.del();
+            layer.close(index);
+        });
+        } else if(obj.event === 'edit'){
+            layer.open({
+                type: 2,
+                skin: 'layui-layer-lan',
+                //style: 'border: none; background-color: #fff; color: #7396a0;',
+                shade: [0.4, '#e4cd86'],
+                shadeClose: true,
+                id: 1,
+                anim: 4,
+                title: "Alterando Cor",
+                content: '/cor/edit?id='+data.id,
+                area: ['500px','250px'],
+            });
+        }
+    });
+});
+
+</script>

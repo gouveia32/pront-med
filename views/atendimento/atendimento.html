@@ -27,119 +27,114 @@
     <table width="100%">
         <tr>
             <td style="width: 80%;">
-                    <div class="layui-layout layui-layout-admin" style="padding-left: 10px;margin-top: 10px;">
-                        <form action="" onsubmit="javascript:;" name="form" method="post">
-                            <div style="border-bottom: 1px dashed rgb(114, 113, 113); height: 25px;">
-                                <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="add">Nova Nota</button>
-                                <button class="layui-btn layui-btn-normal layui-btn-sm" lay-submit="" lay-filter="edit">Gravar</button>
-                                <a class="layui-btn layui-btn-danger layui-btn-sm" href="javascript:;" id="del" lay-submit="">Excluir</a>
-                                <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="import" >Importar</button>
-                                <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="print" >Imprimir</button>
+                <div class="layui-layout layui-layout-admin" style="padding-left: 10px;margin-top: 10px;">
+                    <form action="" onsubmit="javascript:;" name="form" method="post">
+                        <div style="border-bottom: 1px dashed rgb(114, 113, 113); height: 25px;">
+                            <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="add">Novo</button>
+                            <button class="layui-btn layui-btn-normal layui-btn-sm" lay-submit="" lay-filter="edit">Gravar</button>
+                            <a class="layui-btn layui-btn-danger layui-btn-sm" href="javascript:;" id="del" lay-submit="">Excluir</a>
+                            <button class="layui-btn layui-btn-warm layui-btn-sm" lay-submit="" lay-filter="import" >Importar</button>
+                            <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="print" >Imprimir</button>
+                        </div>
+                        <br>
+                        <div class="layui-input-inline" style="width: 35%;">
+                            <label class="label-micro">IDENTIFICAÇÃO</label>
+                            <input type="text" name="nome" id="nome"  autocomplete="off" placeholder="digite um identificador" class="layui-input form-control field-text" value="{{.atendimento.Nome}}">
+                        </div>
+        
+        
+                        <div class="layui-input-inline" style="width: 25%;">
+                            <label class="label-micro"> COR DO FUNDO:</label>
+                            <div class="layui-input-inline">
+                                <select name="cor_id" id="cor_id" lay-verify="required" onchange="corSelectChange()" >
+                                    <option value="-1">Selecione uma cor</option>
+                                    {{range $index,$elem := .corlists}}
+                                    <option name="n1n2n3" value="{{$elem.Id}}">({{$elem.Cor}}) {{$elem.Nome}}</option>
+                                    {{end}}
+                                </select>
                             </div>
-                            <br>
-                            <div class="layui-input-inline" style="width: 35%;">
-                                <label class="label-micro">IDENTIFICAÇÃO</label>
-                                <input type="text" name="nome" id="nome"  autocomplete="off" placeholder="digite um identificador" class="layui-input form-control field-text" value="{{.atendimento.Nome}}">
-                            </div>
-            
-            
-                            <div class="layui-input-inline" style="width: 25%;">
-                                <label class="label-micro"> COR DO FUNDO:</label>
-                                <div class="layui-input-inline">
-                                    <select name="cor_id" id="cor_id" lay-verify="required" onchange="corSelectChange()" >
-                                        <option value="-1">Selecione uma cor</option>
-                                        {{range $index,$elem := .corlists}}
-                                        <option name="n1n2n3" value="{{$elem.Id}}">({{$elem.Cor}}) {{$elem.Nome}}</option>
-                                        {{end}}
-                                    </select>
-                                </div>
-                            </div>  
-            
-                            <!-- Barra de ferramentas -->
-                            <div quill-editor-toolbar id="toolbar" style="width=80%; background-color: #f5f8d9;">
-                        
-                                <span title="Fonte" class="ql-formats">
-                                    <select class="ql-font">
-                                      <option selected></option>
-                                      <option value="serif"></option>
-                                      <option value="monospace"></option>
-                                    </select>
-                                </span>
-                        
-                                <span title="Alinhamento" class="ql-formats">
-                                    <select class="ql-align">
-                                      <option value="" selected></option>
-                                      <option value="center"></option>
-                                      <option value="justify"></option>
-                                      <option value="right"></option>
-                                    </select>
-                                    
-                                    <span title="Limpar" class="ql-format-group">
-                                        <button class="ql-clean" value="clean">Limpar</button>
-                                    </span>
-                                </span>
-            
-                                <span class="ql-format-group">
-                                    <button title="Negrito" class="ql-bold"></button>
-                                    <button title="Itálico" class="ql-italic"></button>
-                                    <button title="Sublinhado" class="ql-underline"></button>
-                                </span>
-                                <span class="ql-format-group">
-                                    <button title="Subescrito" class="ql-script" value="sub"></button>
-                                    <button title="Superescrito" class="ql-script" value="super"></button>
-                                </span>
-                        
-                                <span class="ql-format-group">
-                                    <select class="ql-color"></select>
-                                    <select class="ql-background"></select>
-                                </span>
-                                 
-                                <span class="ql-format-group">
-                                    <button title="Lista numerada" class="ql-list" value="ordered"></button>
-                                    <button title="Lista simples" class="ql-list" value="bullet"></button>
-                                </span>
+                        </div>  
+        
+                        <!-- Barra de ferramentas -->
+                        <div quill-editor-toolbar id="toolbar" style="width=80%; background-color: #f5f8d9;">
+                    
+                            <span title="Fonte" class="ql-formats">
+                                <select class="ql-font">
+                                    <option selected></option>
+                                    <option value="serif"></option>
+                                    <option value="monospace"></option>
+                                </select>
+                            </span>
+                    
+                            <span title="Alinhamento" class="ql-formats">
+                                <select class="ql-align">
+                                    <option value="" selected></option>
+                                    <option value="center"></option>
+                                    <option value="justify"></option>
+                                    <option value="right"></option>
+                                </select>
                                 
-                                <span class="ql-format-group">
-                                    <select title="Tam Texto" class="ql-size">
-                                        <option value="small">Pequeno</option>
-                                        <!-- Note a missing, thus falsy value, is used to reset to default -->
-                                        <option selected>Normal</option>
-                                        <option value="large">Grande</option>
-                                        <option value="huge">Super</option>
-                                    </select>    
+                                <span title="Limpar" class="ql-format-group">
+                                    <button class="ql-clean" value="clean">Limpar</button>
                                 </span>
-            
-                            </div>
-                            <!-- Conteudo -->
-                            <div name="div_conteudo">
-                                <div id="editor" style="width: 100%; height: 450px"></div>
-                            </div>
-            
-                            <input type="hidden" name="paciente_id" autocomplete="off" id="paciente_id" class="layui-input" value="{{.paciente.Id}}">
-                            <input type="hidden" name="id" autocomplete="off" class="layui-input" id="id" value="0">
-                            <input type="hidden" name="aId" autocomplete="off" id="aId" class="layui-input" readonly value="{{.atendimento.aId}}">                             
-                            <input type="hidden" name="nId" autocomplete="off" id="nId" class="layui-input" readonly value="{{.atendimento.nId}}">
-                            <input type="hidden" name="cor" autocomplete="off" id="cor" class="layui-input" readonly value="{{.atendimento.Cor}}">
-                            <input type="hidden" name="id_atual" autocomplete="off" class="layui-input" id="id_atual" value="{{.paciente.NoSelecionado}}">
-                            <input type="hidden" name="conteudo" autocomplete="off" id="conteudo" class="layui-input" value="{{.atendimento.Conteudo}}">
-            
-                        </form>
-                    </div>
+                            </span>
+        
+                            <span class="ql-format-group">
+                                <button title="Negrito" class="ql-bold"></button>
+                                <button title="Itálico" class="ql-italic"></button>
+                                <button title="Sublinhado" class="ql-underline"></button>
+                            </span>
+                            <span class="ql-format-group">
+                                <button title="Subescrito" class="ql-script" value="sub"></button>
+                                <button title="Superescrito" class="ql-script" value="super"></button>
+                            </span>
+                    
+                            <span class="ql-format-group">
+                                <select class="ql-color"></select>
+                                <select class="ql-background"></select>
+                            </span>
+                                
+                            <span class="ql-format-group">
+                                <button title="Lista numerada" class="ql-list" value="ordered"></button>
+                                <button title="Lista simples" class="ql-list" value="bullet"></button>
+                            </span>
+                            
+                            <span class="ql-format-group">
+                                <select title="Tam Texto" class="ql-size">
+                                    <option value="small">Pequeno</option>
+                                    <!-- Note a missing, thus falsy value, is used to reset to default -->
+                                    <option selected>Normal</option>
+                                    <option value="large">Grande</option>
+                                    <option value="huge">Super</option>
+                                </select>    
+                            </span>
+        
+                        </div>
+                        <!-- Conteudo -->
+                        <div name="div_conteudo">
+                            <div id="editor" style="width: 100%; height: 450px"></div>
+                        </div>
+        
+                        <input type="hidden" name="paciente_id" autocomplete="off" id="paciente_id" class="layui-input" value="{{.paciente.Id}}">
+                        <input type="hidden" name="id" autocomplete="off" class="layui-input" id="id" value="0">
+                        <input type="hidden" name="aId" autocomplete="off" id="aId" class="layui-input" readonly value="{{.atendimento.aId}}">                             
+                        <input type="hidden" name="nId" autocomplete="off" id="nId" class="layui-input" readonly value="{{.atendimento.nId}}">
+                        <input type="hidden" name="cor" autocomplete="off" id="cor" class="layui-input" readonly value="{{.atendimento.Cor}}">
+                        <input type="hidden" name="id_atual" autocomplete="off" class="layui-input" id="id_atual" value="{{.paciente.NoSelecionado}}">
+                        <input type="hidden" name="conteudo" autocomplete="off" id="conteudo" class="layui-input" value="{{.atendimento.Conteudo}}">
+        
+                    </form>
+                </div>
                             
             </td>
             <td width="20%">
                 <ul id="treeDemo" class="ztree" style="vertical-align: top; margin-left: 10px; height:600px; width: auto; margin-right: 10px;">
-                    <!--<div class="zTreeDemoBackground left" style="width: 100%;margin-left: 20px;margin-right: 0px">
-                        <ul  style="height:600px; width: 20%; margin-bottom: 10px;">
-                        </ul>
-                    </div>-->
                 </ul>
             </td>
 
         </tr>
     </table>
-
-    
+ 
 </div>
 
 <script>
@@ -272,6 +267,7 @@
                         var form_data = $("form").serialize();
                         $.post('{{urlfor "AtendimentoController.AjaxSave"}}', form_data, function (out) {   
                             if (out.status == 0) {
+                                document.documentElement.style.cursor = 'default';
                                 layer.msg("Gravado com sucesso!",{icon: 1},function () {
                                     window.location.reload();
                                 });
@@ -297,6 +293,7 @@
                 $("form[name=form]").find("div[name=div_conteudo]").css('background-color', cor);
             }).change();
 
+            
             form.render();
             //No entanto, se seu HTML for gerado dinamicamente, a renderização automática falhará
             //Portanto, você precisa executar os seguintes métodos para renderizar manualmente nos locais correspondentes, semelhante a este element.init();
@@ -330,7 +327,10 @@
         };
 
         function editOnClick(e, treeId, treeNode) {
-            var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo")
+
+            document.documentElement.style.cursor = 'wait';
+
             nodes = zTree.getSelectedNodes();
 
             if(nodes[0].parentTId){
@@ -433,6 +433,8 @@
             var nId = $("#nId").val();
             var pId = $("#paciente_id").val();
             var time   = Date.parse(new Date());
+            
+
             $.ajax({
                 type: "POST",
                 url: "/atendimento/getnodes?paciente_id="+pId,

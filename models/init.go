@@ -35,11 +35,11 @@ func Init() {
 		dsn = dsn + "&loc=" + url.QueryEscape(timezone)
 	}
 
-	//maxIdle, _ := beego.AppConfig.Int("maxIdle")
-	//maxConn, _ := beego.AppConfig.Int("maxConn")
+	maxIdle, _ := beego.AppConfig.Int("maxIdle")
+	maxConn, _ := beego.AppConfig.Int("maxConn")
 
-	orm.RegisterDriver("mysql", orm.DRMySQL)
-	//orm.RegisterDataBase("default", "mysql", dsn, 30)
+	//orm.RegisterDriver("mysql", orm.DRMySQL)
+	orm.RegisterDataBase("default", "mysql", dsn, maxIdle, maxConn)
 	orm.RegisterDataBase("default", "mysql", dsn)
 	orm.RegisterModel(new(Auth), new(Role), new(RoleAuth), new(Admin),
 		new(Group), new(Cor), new(Env), new(Code), new(ApiSource), new(ApiDetail), new(ApiPublic), new(Template), new(Paciente),

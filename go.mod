@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/astaxie/beego v1.10.1
-	github.com/go-sql-driver/mysql v1.5.0
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 )
 

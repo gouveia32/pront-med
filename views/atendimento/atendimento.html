@@ -145,6 +145,7 @@
         theme: 'snow'
     });
     quill.root.innerHTML = document.getElementById("conteudo").value;
+    document.documentElement.style.cursor = 'default';
 </script>
 
 <script>
@@ -217,7 +218,6 @@
                             }
 
                           });     
-
                         return false;
                         break;
                     case 'print':
@@ -276,6 +276,7 @@
                             }
                         }, "json");
                         return false;
+                        break;
 
                 }
             });
@@ -381,12 +382,14 @@
                         $("form[name=form]").find("select[name=cor_id]").val(data.data.CorId);
             
                         form.render();
+                        document.documentElement.style.cursor = 'default';
                     }
                 }
             }); 
         }
 
         function beforeDrag(treeId, treeNodes) {
+            document.documentElement.style.cursor = 'default';
             return false;
         }
         
@@ -434,6 +437,7 @@
             var pId = $("#paciente_id").val();
             var time   = Date.parse(new Date());
             
+            document.documentElement.style.cursor = 'wait';
 
             $.ajax({
                 type: "POST",
@@ -468,6 +472,7 @@
         }
 
         $(".toolTop").click(function () {
+            document.documentElement.style.cursor = 'wait';
             var pacienteId = $("#paciente_id").val();
             layer.open({
                 type: 2,

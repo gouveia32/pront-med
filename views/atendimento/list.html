@@ -122,6 +122,7 @@
     //Barra de ferramentas do monitor
     table.on('tool(table_filter)', function(obj){
         var data = obj.data;
+        document.documentElement.style.cursor = 'wait';
         if(obj.event === 'detail'){
             //layer.msg('ID：'+ data.id + ' operação de visualização de');
         } else if(obj.event === 'del'){

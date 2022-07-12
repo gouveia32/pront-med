@@ -38,7 +38,7 @@
                         </div>
                         <br>
                         <div class="layui-input-inline" style="width: 35%;">
-                            <label class="label-micro">IDENTIFICAÇÃO</label>
+                            <label name="labelIdent" class="label-micro">IDENTIFICAÇÃO</label>
                             <input type="text" name="nome" id="nome"  autocomplete="off" placeholder="digite um identificador" class="layui-input form-control field-text" value="{{.atendimento.Nome}}">
                         </div>
         
@@ -154,6 +154,7 @@
     layui.config({
                 base : "js/"
         }).use(['form','element','layer','jquery'],function(){
+            document.documentElement.style.cursor = 'default';
           form = layui.form; //Somente após esta etapa ser realizada, alguns elementos do formulário serão decorados automaticamente com sucesso
           $ = layui.jquery;
           form.on("submit",function(data) {
@@ -292,6 +293,7 @@
                 //console.info(cor);
 
                 $("form[name=form]").find("div[name=div_conteudo]").css('background-color', cor);
+                
             }).change();
 
             
@@ -378,12 +380,20 @@
                         $("form[name=form]").find("input[name=conteudo]").val(data.data.nota.Conteudo);
                         quill.root.innerHTML = data.data.nota.Conteudo;
 
+                        if (data.data.nId == 0) {
+                            $("form[name=form]").find("label[name=labelIdent]").text('IDENTIFICAÇÃO DO ATENDIMENTO');
+                        } else {
+                            $("form[name=form]").find("label[name=labelIdent]").text('IDENTIFICAÇÃO DA NOTA');
+                        }
+                        
+
                         $("form[name=form]").find("div[name=div_conteudo]").css('background-color', data.data.Cor);
                         $("form[name=form]").find("select[name=cor_id]").val(data.data.CorId);
             
                         form.render();
-                        document.documentElement.style.cursor = 'default';
+                      
                     }
+                    document.documentElement.style.cursor = 'default';
                 }
             }); 
         }
@@ -465,6 +475,7 @@
                         editOnClick(null, null, node);
 
                         $("form[name=form]").find("input[name=nome]").val(node.name);                 
+                        document.documentElement.style.cursor = 'default';
                     }
                 }
             }); 

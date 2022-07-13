@@ -33,7 +33,7 @@
                             <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="add">Novo</button>
                             <button class="layui-btn layui-btn-normal layui-btn-sm" lay-submit="" lay-filter="edit">Gravar</button>
                             <a class="layui-btn layui-btn-danger layui-btn-sm" href="javascript:;" id="del" lay-submit="">Excluir</a>
-                            <button class="layui-btn layui-btn-warm layui-btn-sm" lay-submit="" lay-filter="import" >Importar</button>
+                            <button class="layui-btn layui-btn-warm layui-btn-sm" lay-submit="" lay-filter="modelo" >Modelo</button>
                             <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="print" >Imprimir</button>
                         </div>
                         <br>
@@ -170,7 +170,7 @@
                             quill.root.innerHTML = '';
                         return false;
                         break;
-                    case 'import':
+                    case 'modelo':
                         var pacienteId = $("#paciente_id").val();
                         var modId = layer.open({
                             title: 'Selecione um Modelo',
